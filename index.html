@@ -1,54 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexoApp Private Call</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        #root { width: 100vw; height: 100vh; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
+<script>
+  const appID = 233961104;
+  const serverSecret = "f043619bceef40c26c0c3b46432eca06";
+  const q = new URLSearchParams(window.location.search);
+  const roomID = q.get("roomID");
+  const userID = q.get("userID");
+  const userName = q.get("userName") || "User";
+  const media = q.get("media") || "voice";
 
-    <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
-    <script>
-        const appID = 233961104;
-        const serverSecret = "8475a53e8eded3d1daaac9fe7baa7222";
-
-        const roomID = "private_" + Math.floor(Math.random() * 1000000);
-        const userID = Math.floor(Math.random() * 10000) + "";
-        const userName = "User_" + userID;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const media = urlParams.get('media') || "voice";
-
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-            appID, serverSecret, roomID, userID, userName
-        );
-
-        const zp = ZegoUIKitPrebuilt.create(kitToken);
-        zp.joinRoom({
-            container: document.querySelector("#root"),
-            sharedLinks: [{
-                name: 'Invite to this Call',
-                url: window.location.protocol + '//' + window.location.host + window.location.pathname + 
-                     '?roomID=' + roomID + '&media=' + media,
-            }],
-            scenario: {
-                mode: ZegoUIKitPrebuilt.OneONoneCall,
-            },
-            turnOnCameraWhenJoining: media === "video",
-            turnOnMicrophoneWhenJoining: true,
-            showMyCameraToggleButton: true,
-            showMyMicrophoneToggleButton: true,
-            showAudioVideoSettingsButton: true,
-            showTextChat: true,
-
-            // Try to reduce pre-join screen
-            showPreJoinView: false,
-        });
-    </script>
-</body>
-</html>
+  if (!roomID || !userID) {
+    document.body.innerHTML = "<p style='padding:20px'>Call not ready.</p>";
+  } else {
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+      appID, serverSecret, roomID, userID, userName);
+    const zp = ZegoUIKitPrebuilt.create(kitToken);
+    zp.joinRoom({
+      container: document.querySelector("#root"),
+      scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
+      maxUsers: 2,
+      turnOnCameraWhenJoining: media === "video",
+      turnOnMicrophoneWhenJoining: true,
+      showMyCameraToggleButton: true,
+      showMyMicrophoneToggleButton: true,
+      showAudioVideoSettingsButton: true,
+      showTextChat: true,
+      showPreJoinView: false,
+    });
+  }
+</script>
