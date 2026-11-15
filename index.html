@@ -44,7 +44,7 @@ body{background:#111}
       showPreJoinView: false,
       showTextChat: true
     });
-    saysay("Joining room " + roomID + " (key length " + serverSecret.length + ")");
+    say("key length " + serverSecret.length + " starts " + serverSecret.slice(0,3));
   } catch (err) { say("Error: " + err.message); }
 })();
 </script>
