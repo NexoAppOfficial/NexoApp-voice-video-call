@@ -34,7 +34,7 @@ body{background:#111}
   if (serverSecret === "YOUR_NEW_SECRET") { say("Put your new secret in index.html"); return; }
   try {
     var kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
-    var zp = ZegoUIKitPrebuilt.create(kitToken);
+    var zp = ZegoUIKitPrebuilt.create04AAAAAGr6m1EADG1izbzXYEOPzCe/MwCv/KxvfBb09f08lTTemSDGCip7YCaMVc4LTQnlZYw4pHER+n5MvezYWF4vAao6MzFKt+3RBAt7GpcHLhohHJ2VhF01LkkPA230YYXjjPdsCIJCcD/CMe7Ms7AWsVWGvO90GGF9pu9MrebsexmBQOV4liB4Xx6EXDj53xwZHLffCGXOdmMUbvoxdkviXTLn10YhCDkTJGL1Wgt17G4q3MXE1bbQJu/t5NclsY9/OF9qWAE=
     zp.joinRoom({
       container: document.querySelector("#root"),
       scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
