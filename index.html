@@ -25,12 +25,13 @@ body{background:#111}
   });
   var q = new URLSearchParams(window.location.search);
   var roomID = q.get("roomID") || "test1";
-  var userID = "userID";
-  var userName = q.get("userName") || "User";
+  var userID = "Olaniyi";
+  var userName = q.get("userName") || "Olaniyi";
   var media = q.get("media") || "video";
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
   var appID = 233961104;
-  var token = "04AAAAAGr6m1EADG1izbzXYEOPzCe/MwCv/KxvfBb09f08lTTemSDGCip7YCaMVc4LTQnlZYw4pHER+n5MvezYWF4vAao6MzFKt+3RBAt7GpcHLhohHJ2VhF01LkkPA230YYXjjPdsCIJCcD/CMe7Ms7AWsVWGvO90GGF9pu9MrebsexmBQOV4liB4Xx6EXDj53xwZHLffCGXOdmMUbvoxdkviXTLn10YhCDkTJGL1Wgt17G4q3MXE1bbQJu/t5NclsY9/OF9qWAE=";
+  var token = "04AAAAAGr7blsADH10xAXedqgljJDmEACwx+FGtk6lmmHYyr7Qad85rgtNlf5zAuE29ym8blHsa9/8ElmfJDDoxkiwGK7CAR15KjnhfEqjTu4m0xAW0bXLYK56sAYyP2glAzERip1Z41qbWnuWrf2m5ElX6oxz9qt2cwmnw72m0OgAyO7I+UpPFr2ul014TNM9P4ENdFKWSAgeySHx+XzMg/F2fkCd+wRKFX6t6+PpCML8ppoQ7z3XIYp6y6/WgtcPxsqFUtPjfakB";
+  if (token.indexOf("PASTE") === 0) { say("Paste the token into index.html"); return; }
   try {
     var kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, userName);
     var zp = ZegoUIKitPrebuilt.create(kitToken);
