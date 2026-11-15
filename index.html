@@ -6,38 +6,46 @@
 <title>NexoApp Call</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-#msg{padding:20px;font:16px sans-serif}
+body{background:#111}
 #root{width:100vw;height:100vh}
+#msg{position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px}
 </style>
 </head>
 <body>
-<div id="msg">Loading call...</div>
 <div id="root"></div>
+<div id="msg">Loading call...</div>
 <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
 <script>
 (function () {
   var msg = document.getElementById("msg");
-  window.onerror = function (m) { msg.textContent = "Error: " + m; };
+  function say(t) { msg.textContent = t; }
+  window.onerror = function (m) { say("Error: " + m); };
+  window.addEventListener("unhandledrejection", function (e) {
+    say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
   var q = new URLSearchParams(window.location.search);
   var roomID = q.get("roomID"), userID = q.get("userID");
   var userName = q.get("userName") || "User";
   var media = q.get("media") || "voice";
-  if (!roomID || !userID) { msg.textContent = "Call not ready: roomID or userID is missing."; return; }
-  if (typeof ZegoUIKitPrebuilt === "undefined") { msg.textContent = "Call library did not load."; return; }
+  if (!roomID || !userID) { say("Call not ready: roomID or userID is missing."); return; }
+  if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
   var appID = 233961104;
   var serverSecret = "YOUR_NEW_SECRET";
-  var kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
-  var zp = ZegoUIKitPrebuilt.create(kitToken);
-  msg.style.display = "none";
-  zp.joinRoom({
-    container: document.querySelector("#root"),
-    scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
-    maxUsers: 2,
-    turnOnCameraWhenJoining: media === "video",
-    turnOnMicrophoneWhenJoining: true,
-    showPreJoinView: false,
-    showTextChat: true
-  });
+  if (serverSecret === "YOUR_NEW_SECRET") { say("Put your new secret in index.html"); return; }
+  try {
+    var kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
+    var zp = ZegoUIKitPrebuilt.create(kitToken);
+    zp.joinRoom({
+      container: document.querySelector("#root"),
+      scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
+      maxUsers: 2,
+      turnOnCameraWhenJoining: media === "video",
+      turnOnMicrophoneWhenJoining: true,
+      showPreJoinView: false,
+      showTextChat: true
+    });
+    say("Joining room " + roomID + "...");
+  } catch (err) { say("Error: " + err.message); }
 })();
 </script>
 </body>
