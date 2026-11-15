@@ -1,29 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexoApp Call</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+#msg{padding:20px;font:16px sans-serif}
+#root{width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<div id="msg">Loading call...</div>
+<div id="root"></div>
+<script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
 <script>
-  const appID = 233961104;
-  const serverSecret = "f043619bceef40c26c0c3b46432eca06";
-  const q = new URLSearchParams(window.location.search);
-  const roomID = q.get("roomID");
-  const userID = q.get("userID");
-  const userName = q.get("userName") || "User";
-  const media = q.get("media") || "voice";
-
-  if (!roomID || !userID) {
-    document.body.innerHTML = "<p style='padding:20px'>Call not ready.</p>";
-  } else {
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-      appID, serverSecret, roomID, userID, userName);
-    const zp = ZegoUIKitPrebuilt.create(kitToken);
-    zp.joinRoom({
-      container: document.querySelector("#root"),
-      scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
-      maxUsers: 2,
-      turnOnCameraWhenJoining: media === "video",
-      turnOnMicrophoneWhenJoining: true,
-      showMyCameraToggleButton: true,
-      showMyMicrophoneToggleButton: true,
-      showAudioVideoSettingsButton: true,
-      showTextChat: true,
-      showPreJoinView: false,
-    });
-  }
+(function () {
+  var msg = document.getElementById("msg");
+  window.onerror = function (m) { msg.textContent = "Error: " + m; };
+  var q = new URLSearchParams(window.location.search);
+  var roomID = q.get("roomID"), userID = q.get("userID");
+  var userName = q.get("userName") || "User";
+  var media = q.get("media") || "voice";
+  if (!roomID || !userID) { msg.textContent = "Call not ready: roomID or userID is missing."; return; }
+  if (typeof ZegoUIKitPrebuilt === "undefined") { msg.textContent = "Call library did not load."; return; }
+  var appID = 233961104;
+  var serverSecret = "YOUR_NEW_SECRET";
+  var kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
+  var zp = ZegoUIKitPrebuilt.create(kitToken);
+  msg.style.display = "none";
+  zp.joinRoom({
+    container: document.querySelector("#root"),
+    scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
+    maxUsers: 2,
+    turnOnCameraWhenJoining: media === "video",
+    turnOnMicrophoneWhenJoining: true,
+    showPreJoinView: false,
+    showTextChat: true
+  });
+})();
 </script>
+</body>
+</html>
