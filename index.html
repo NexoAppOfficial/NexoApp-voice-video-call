@@ -30,7 +30,7 @@ body{background:#111}
   if (!roomID || !userID) { say("Call not ready: roomID or userID is missing."); return; }
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
   var appID = 233961104;
-  var serverSecret = "YOUR_NEW_SECRET";
+  var serverSecret = "f043619bceef40c26c0c3b46432eca06";
   if (serverSecret === "YOUR_NEW_SECRET") { say("Put your new secret in index.html"); return; }
   try {
     var kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
