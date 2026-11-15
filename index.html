@@ -24,10 +24,10 @@ body{background:#111}
     say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
   var q = new URLSearchParams(window.location.search);
-  var roomID = q.get("roomID"), userID = q.get("userID");
+  var roomID = q.get("roomID") || "test1";
+  var userID = "userID";
   var userName = q.get("userName") || "User";
-  var media = q.get("media") || "voice";
-  if (!roomID || !userID) { say("Call not ready: roomID or userID is missing."); return; }
+  var media = q.get("media") || "video";
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
   var appID = 233961104;
   var token = "04AAAAAGr6m1EADG1izbzXYEOPzCe/MwCv/KxvfBb09f08lTTemSDGCip7YCaMVc4LTQnlZYw4pHER+n5MvezYWF4vAao6MzFKt+3RBAt7GpcHLhohHJ2VhF01LkkPA230YYXjjPdsCIJCcD/CMe7Ms7AWsVWGvO90GGF9pu9MrebsexmBQOV4liB4Xx6EXDj53xwZHLffCGXOdmMUbvoxdkviXTLn10YhCDkTJGL1Wgt17G4q3MXE1bbQJu/t5NclsY9/OF9qWAE=";
@@ -43,7 +43,7 @@ body{background:#111}
       showPreJoinView: false,
       showTextChat: true
     });
-    say("Joining room " + roomID + "...");
+    say("Joining room " + roomID + " as " + userID + "...");
   } catch (err) { say("Error: " + err.message); }
 })();
 </script>
