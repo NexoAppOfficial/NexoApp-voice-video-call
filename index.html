@@ -1,38 +1,75 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8">
+<html>
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NexoApp Call</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#111}
-#root{width:100vw;height:100vh}
-#msg{position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px}</style>
-</head><body>
-<div id="root"></div><div id="msg">Loading call...</div>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111}
+  #root{width:100vw;height:100vh}
+  #msg{position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px;word-break:break-all}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="msg">Loading call...</div>
+
 <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+
 <script>
 (function () {
   var msg = document.getElementById("msg");
   function say(t) { msg.style.display = "block"; msg.textContent = t; }
+
   window.onerror = function (m) { say("Error: " + m); };
-  window.addEventListener("unhandledrejection", function (e) { say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason)); });
+  window.addEventListener("unhandledrejection", function (e) {
+    say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+
   var q = new URLSearchParams(location.search);
   var h = new URLSearchParams(location.hash.slice(1));
-  var roomID = q.get("roomID"), userName = q.get("userName") || "User";
-  var media = q.get("media") || "voice", jwt = h.get("jwt");
-  if (!roomID || !jwt) { say("Call not ready."); return; }
+
+  var roomID = q.get("roomID");
+  var userName = q.get("userName") || "User";
+  var media = q.get("media") || "voice";
+  var jwt = q.get("jwt") || h.get("jwt");
+
+  if (!roomID) { say("Missing roomID. URL: " + location.href); return; }
+  if (!jwt) { say("Missing jwt. URL: " + location.href); return; }
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
+
   fetch("https://usdkrqvgfqlxbrzgjrnb.supabase.co/functions/v1/zego-token", {
-    method: "POST", headers: { Authorization: "Bearer " + jwt }
-  }).then(function (r) { return r.json(); }).then(function (d) {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + jwt,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ roomID: roomID })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
     if (!d.token) throw new Error(d.error || "No token");
-    var kit = ZegoUIKitPrebuilt.generateKitTokenForProduction(d.appID, d.token, roomID, d.userID, userName);
+
+    var kit = ZegoUIKitPrebuilt.generateKitTokenForProduction(
+      d.appID, d.token, roomID, d.userID, userName
+    );
     var zp = ZegoUIKitPrebuilt.create(kit);
+
     zp.joinRoom({
       container: document.querySelector("#root"),
-      scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall }, maxUsers: 2,
-      turnOnCameraWhenJoining: media === "video", turnOnMicrophoneWhenJoining: true,
-      showPreJoinView: false, showTextChat: false
+      scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
+      maxUsers: 2,
+      turnOnCameraWhenJoining: media === "video",
+      turnOnMicrophoneWhenJoining: true,
+      showPreJoinView: false,
+      showTextChat: false
     });
+
     msg.style.display = "none";
-  }).catch(function (e) { say("Error: " + e.message); });
+  })
+  .catch(function (e) { say("Error: " + e.message); });
 })();
-</script></body></html>
+</script>
+</body>
+</html>
