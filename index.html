@@ -30,7 +30,7 @@ body{background:#111}
   var media = q.get("media") || "video";
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
   var appID = 233961104;
-  var token "04AAAAAGr7wS4ADCDRqqL4yyjKw7lAPgCxpPhg5fgReVqBdooLAXsIc1rQ5VxBAU6VnYGl3sup75pBctRwMyQtlHu4Jxr/WzQT1qXT89+zD2M90g3do2czcfb9sj9u5n6vKkxHhIqB0Fji0CR4QuvdrDh8K5hBD16Ziidz0oOqtzbZ+aw2oMLo7MBPN0CzbIZzlOzlk2LbAolZI1degDNq9+nc19+O6l5WaYhptmdkI8khzQdCL8fVVogpkgyQsED+AHdl7O6wu6FiAQ==";
+  var token = "04AAAAAGr7wS4ADCDRqqL4yyjKw7lAPgCxpPhg5fgReVqBdooLAXsIc1rQ5VxBAU6VnYGl3sup75pBctRwMyQtlHu4Jxr/WzQT1qXT89+zD2M90g3do2czcfb9sj9u5n6vKkxHhIqB0Fji0CR4QuvdrDh8K5hBD16Ziidz0oOqtzbZ+aw2oMLo7MBPN0CzbIZzlOzlk2LbAolZI1degDNq9+nc19+O6l5WaYhptmdkI8khzQdCL8fVVogpkgyQsED+AHdl7O6wu6FiAQ==";
   if (token.indexOf("PASTE") === 0) { say("Paste the token into index.html"); return; }
   try {
     var kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, userName);
