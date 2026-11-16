@@ -1,51 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NexoApp Call</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="preconnect" href="https://usdkrqvgfqlxbrzgjrnb.supabase.co">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#111}
-#root{width:100vw;height:100vh}
-#msg{position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px}
+html,body{height:100%;background:#111}
+#root{width:100vw;height:100vh;height:100dvh}
+#msg{position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#fff;font:14px sans-serif;padding:10px;text-align:center}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<div id="msg">Loading call...</div>
+<div id="msg">Connecting...</div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var h = new URLSearchParams(location.hash.slice(1));
+  var roomID = q.get("roomID"), jwt = h.get("jwt");
+  window.CALL = { roomID: roomID, media: q.get("media") === "video" ? "video" : "voice",
+    name: (q.get("userName") || "User").slice(0, 30), tokenReq: null, error: null };
+  if (jwt) history.replaceState(null, "", location.pathname + location.search);
+  if (!roomID || !jwt) { window.CALL.error = "Call not ready."; return; }
+  window.CALL.tokenReq = fetch("https://usdkrqvgfqlxbrzgjrnb.supabase.co/functions/v1/zego-token", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + jwt, "Content-Type": "application/json" },
+    body: JSON.stringify({ roomID: roomID })
+  }).then(function (r) { return r.json(); });
+})();
+</script>
 <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
 <script>
 (function () {
-  var msg = document.getElementById("msg");
-  function say(t) { msg.textContent = t; }
+  var msg = document.getElementById("msg"), C = window.CALL;
+  function say(t) { msg.style.display = "block"; msg.textContent = t; }
   window.onerror = function (m) { say("Error: " + m); };
   window.addEventListener("unhandledrejection", function (e) {
     say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
-  var q = new URLSearchParams(window.location.search);
-  var roomID = q.get("roomID") || "test1";
-  var userID = "Olaniyi";
-  var userName = q.get("userName") || "Olaniyi";
-  var media = q.get("media") || "video";
+  if (C.error) { say(C.error); return; }
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
-  var appID = 233961104;
-  var token = "04AAAAAGr7wS4ADCDRqqL4yyjKw7lAPgCxpPhg5fgReVqBdooLAXsIc1rQ5VxBAU6VnYGl3sup75pBctRwMyQtlHu4Jxr/WzQT1qXT89+zD2M90g3do2czcfb9sj9u5n6vKkxHhIqB0Fji0CR4QuvdrDh8K5hBD16Ziidz0oOqtzbZ+aw2oMLo7MBPN0CzbIZzlOzlk2LbAolZI1degDNq9+nc19+O6l5WaYhptmdkI8khzQdCL8fVVogpkgyQsED+AHdl7O6wu6FiAQ==";
-  if (token.indexOf("PASTE") === 0) { say("Paste the token into index.html"); return; }
-  try {
-    var kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, userName);
-    var zp = ZegoUIKitPrebuilt.create(kitToken);
+  C.tokenReq.then(function (d) {
+    if (!d.token) throw new Error(d.error || "No token");
+    var kit = ZegoUIKitPrebuilt.generateKitTokenForProduction(d.appID, d.token, C.roomID, d.userID, C.name);
+    var zp = ZegoUIKitPrebuilt.create(kit);
     zp.joinRoom({
       container: document.querySelector("#root"),
       scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
       maxUsers: 2,
-      turnOnCameraWhenJoining: media === "video",
+      turnOnCameraWhenJoining: C.media === "video",
       turnOnMicrophoneWhenJoining: true,
       showPreJoinView: false,
-      showTextChat: true
+      showLeavingView: false,
+      showTextChat: false,
+      showUserList: false,
+      showRoomDetailsButton: false,
+      showScreenSharingButton: false,
+      showLayoutButton: false,
+      onLeaveRoom: function () { location.replace("about:blank"); }
     });
-    say("Joining room " + roomID + " as " + userID + "...");
-  } catch (err) { say("Error: " + err.message); }
+    msg.style.display = "none";
+  }).catch(function (e) { say("Error: " + e.message); });
 })();
 </script>
 </body>
