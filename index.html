@@ -5,57 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NexoApp Call</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#111}
-  #root{width:100vw;height:100vh}
-  #msg{position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px;word-break:break-all}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111}
+#root{width:100vw;height:100vh}
+#msg{position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#fff;font:13px sans-serif;padding:8px}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <div id="msg">Loading call...</div>
-
 <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
-
 <script>
 (function () {
   var msg = document.getElementById("msg");
-  function say(t) { msg.style.display = "block"; msg.textContent = t; }
-
+  function say(t) { msg.textContent = t; }
   window.onerror = function (m) { say("Error: " + m); };
   window.addEventListener("unhandledrejection", function (e) {
     say("Error: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
-
-  var q = new URLSearchParams(location.search);
-  var h = new URLSearchParams(location.hash.slice(1));
-
-  var roomID = q.get("roomID");
-  var userName = q.get("userName") || "User";
-  var media = q.get("media") || "voice";
-  var jwt = q.get("jwt") || h.get("jwt");
-
-  if (!roomID) { say("Missing roomID. URL: " + location.href); return; }
-  if (!jwt) { say("Missing jwt. URL: " + location.href); return; }
+  var q = new URLSearchParams(window.location.search);
+  var roomID = q.get("roomID") || "test1";
+  var userID = "Olaniyi";
+  var userName = q.get("userName") || "Olaniyi";
+  var media = q.get("media") || "video";
   if (typeof ZegoUIKitPrebuilt === "undefined") { say("Call library did not load."); return; }
-
-  fetch("https://usdkrqvgfqlxbrzgjrnb.supabase.co/functions/v1/zego-token", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + jwt,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ roomID: roomID })
-  })
-  .then(function (r) { return r.json(); })
-  .then(function (d) {
-    if (!d.token) throw new Error(d.error || "No token");
-
-    var kit = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-      d.appID, d.token, roomID, d.userID, userName
-    );
-    var zp = ZegoUIKitPrebuilt.create(kit);
-
+  var appID = 233961104;
+  var token = "8475a53e8eded3d1daaac9fe7baa7222";
+  if (token.indexOf("PASTE") === 0) { say("Paste the token into index.html"); return; }
+  try {
+    var kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, userName);
+    var zp = ZegoUIKitPrebuilt.create(kitToken);
     zp.joinRoom({
       container: document.querySelector("#root"),
       scenario: { mode: ZegoUIKitPrebuilt.OneONoneCall },
@@ -63,12 +42,10 @@
       turnOnCameraWhenJoining: media === "video",
       turnOnMicrophoneWhenJoining: true,
       showPreJoinView: false,
-      showTextChat: false
+      showTextChat: true
     });
-
-    msg.style.display = "none";
-  })
-  .catch(function (e) { say("Error: " + e.message); });
+    say("Joining room " + roomID + " as " + userID + "...");
+  } catch (err) { say("Error: " + err.message); }
 })();
 </script>
 </body>
